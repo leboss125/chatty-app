@@ -21,33 +21,34 @@ class App extends Component {
         }
       ]
     }
+    this.Socket = {}
   }
-
+  
   componentDidMount() {
+    // setto true when document component is ready
     this.setState({documentReady:true})
-    console.log("componentDidMount <App />");
+
     setTimeout(() => {
       console.log("Simulating incoming message");
-      let Socket = new WebSocket("ws://localhost:3001");
-      Socket.onopen = (event) => {
+      this.Socket = new WebSocket("ws://localhost:3001");
+      this.Socket.onopen = (event) => {
         console.log('conneced to the server')
-        Socket.send("Here's some text that the server is urgently awaiting!"); 
       };
-      // Add a new message to the list of messages in the data store   
-      // Update the state of the app component.
-      // Calling setState will trigger a call to render() in App and all child components.
     }, 3000);
+
   }
 
 
   userInput = (e) =>{
+    // check if the all component are mounted
     if(this.state.documentReady){
       if(e.key === 'Enter'){
-        const newMessage = {id: 6, username: this.state.currentUser.name, content: e.target.value};
-        const messages = this.state.messages.concat(newMessage)
-        this.setState({messages: messages})
+        const newMessage = {username: this.state.currentUser.name, content: e.target.value};
+        // const messages = this.state.messages.concat(newMessage)
+        // this.setState({messages: messages})
         // this is for test 
-        console.log(e.target.value);
+        console.log(e.target.value);        
+        this.Socket.send(JSON.stringify(newMessage));
       }
     }
   }
