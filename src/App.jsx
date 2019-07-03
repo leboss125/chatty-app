@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import messages from './messages';
-import Message from './Message';
 import ChatBar from './ChatBar';
 import MessageList from './MessageList';
 
@@ -9,7 +8,7 @@ class App extends Component {
     super(props);
     this.state = {
       documentReady:false,
-      currentUser: {name: "Bob"},
+      currentUser: {name: "jimmy"},
       messages: []
     }
     this.Socket = {}
@@ -21,15 +20,24 @@ class App extends Component {
 
     setTimeout(() => {
       console.log("Simulating incoming message");
+      // connect to the ws server
+
       this.Socket = new WebSocket("ws://localhost:3001");
+
       this.Socket.onopen = (event) => {
-        console.log('conneced to the server')
-        this.Socket.onmessage = function (event) {
-          const resultData = JSON.parse(event.data);
-          const messages = this.state.messages.concat(newMessage)
+
+        console.log('connected to the server')
+        // getting the messages from the server
+        this.Socket.onmessage =  (event) => {
+
+          const newMessage = JSON.parse(event.data);
+
+          const messages = [...this.state.messages, newMessage]
+          console.log('hello 3',messages)
+          this.setState({messages})
         }
       };
-    }, 3000);
+    },);
 
   }
 
@@ -68,7 +76,7 @@ class App extends Component {
     </nav>
     
     <div className="message system">
-      <Message messages={this.state.messages} user={this.state.currentUser.name} />
+      <MessageList messages={this.state.messages} user={this.state.currentUser.name} />
     </div>
   <ChatBar user={this.state.currentUser.name} setUser={this.newUser} newMessage={this.userInput}  />
   </div>
