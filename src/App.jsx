@@ -10,16 +10,7 @@ class App extends Component {
     this.state = {
       documentReady:false,
       currentUser: {name: "Bob"},
-      messages: [
-        {
-          username: "Bob",
-          content: "Has anyone seen my marbles?",
-        },
-        {
-          username: "Anonymous",
-          content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
-        }
-      ]
+      messages: []
     }
     this.Socket = {}
   }
@@ -33,6 +24,10 @@ class App extends Component {
       this.Socket = new WebSocket("ws://localhost:3001");
       this.Socket.onopen = (event) => {
         console.log('conneced to the server')
+        this.Socket.onmessage = function (event) {
+          const resultData = JSON.parse(event.data);
+          const messages = this.state.messages.concat(newMessage)
+        }
       };
     }, 3000);
 
