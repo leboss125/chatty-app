@@ -1,14 +1,27 @@
 import React, {Component} from 'react';
 import Message from './Message'; 
+import Notification from './Notification';
 
 class MessageList extends Component {
   constructor(props){
     super(props);
   }
   render() {
-  const messages = this.props.messages.map((message, index) => <Message id={index} message={message} /> )
+  const messages = this.props.messages.map((message, index) =>{
+    console.log('les message dans le map ',message)
+    if(message.type === "incomingMessage"){
+      return(
+        <Message message={message} key={message.id}/>
+      )
+    }else if(message.type === "incomingNotification"){
+      return (
+        <Notification message={message} key={message.id} />
+      )
+    }
+    
+  } )
     return (
-        <div className="messages">
+        <div>
             {messages}
         </div>
     );

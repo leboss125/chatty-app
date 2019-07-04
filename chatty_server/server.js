@@ -20,19 +20,39 @@ const wss = new SocketServer({ server });
 wss.on('connection', (ws) => {
   console.log('Client connected');
   ws.on('message', (data)=>{
-    const {username, content} = JSON.parse(data);
-    const userMessage =  {
-        id:uuidv4(),
-        username, 
-        content
-    };
-    wss.clients.forEach(function each(client) {
-
-        console.log('hello')
-        if (client.readyState) {
-          client.send(JSON.stringify(userMessage));
+    const {username, content, type, currentUserName, newUserName } = JSON.parse(data);
+        if(type && type === "postMessage"){
+            const userMessage =  {
+                id:uuidv4(),
+                type:'incomingMessage',
+                username, 
+                content
+            };
+            wss.clients.forEach(function each(client) {
+                if (client.readyState) {
+                  client.send(JSON.stringify(userMessage));
+                }
+              }); 
         }
-      });  
+        else if(type && type === 'postNotification'){
+            // {"type": "incomingNotification", "content": "UserA has changed their name to UserB."}
+            const newNotification =  {
+                id:uuidv4(),
+                type: 'incomingNotification',
+                content: `User ${currentUserName} has changed their name to ${newUserName}`
+            };
+            if(newUserName === ""){
+                newNotification['content'] = `User ${currentUserName} has changed their name to Anonymous`
+              }
+            console.log('notification', newNotification)
+            wss.clients.forEach(function each(client) {
+                if (client.readyState) {
+                  client.send(JSON.stringify(newNotification));
+                }
+              }); 
+        }
+     
+    
 })
 
 
